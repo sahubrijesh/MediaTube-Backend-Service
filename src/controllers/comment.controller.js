@@ -9,58 +9,49 @@ const getVideoComments = asyncHandler(async (req, res) => {
     const {videoId} = req.params
     const {page = 1, limit = 10} = req.query
 
+    if (!videoId?.trim()) {
+        throw new ApiError(400, "videoId is required")
+    }
+
+    
+
+    const comments = await Comment
+    .find({video: videoId})
+    .populate({ path: "owner", select: "username" })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .sort({createdAt: -1})
+    .lean()
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, comments, "Comments fetched successfully")
+    )
+
 })
 
 const addComment = asyncHandler(async (req, res) => {
     // TODO: add a comment to a video
-    const {videoId,comment} = req.body
+    const {videoId} = req.params
+    const {comment} = req.body
 
     if (!videoId?.trim() || !comment?.trim()) {
         throw new ApiError(400, "videoId and comment are required")
     }
     
-    const newComment = await Comment.aggregate([
-        {
-            $match: {
-                video: mongoose.Types.ObjectId(videoId),
-                owner: mongoose.Types.ObjectId(req.user._id)
-            }
-        },
-        {
-            $lookup: {
-                from: "users",
-                localField: "owner",
-                foreignField: "_id",
-                as: "owner"
-            }
-        },
-        {
-            $set: {
-                content: comment
-            }
-        },
-        {
-            $unwind: "$owner"
-        },
-        {
-            $project: {
-                _id: 1,
-                content: 1,
-                owner: {
-                    _id: 1,
-                    fullName: 1,
-                    userName: 1,
-                    avatar: 1
-                }
-            }
-        }
-    ])
+    const newComment = await Comment.create({
+        video: videoId,
+        owner: req.user._id,
+        content: comment
+    })
 
     return res
-    .status(200)
+    .status(201)
     .json(
-        new ApiResponse(200, newComment[0], "Comment added successfully")
+        new ApiResponse(201, newComment, "Comment added successfully")
     )
+
 })
 
 const updateComment = asyncHandler(async (req, res) => {
