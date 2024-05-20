@@ -8,8 +8,25 @@ import {uploadOnCloudinary} from "../utils/cloudinary.js"
 
 
 const getAllVideos = asyncHandler(async (req, res) => {
-    const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
-    //TODO: get all videos based on query, sort, pagination
+    const { page = 1, limit = 10, query, sortBy = "createdAt", sortType = -1 } = req.query;
+
+    // Construct the filter/search conditions based on the query if provided
+    const searchCondition = query ? { $text: { $search: query } } : {};
+
+    // Fetch the videos from the database with pagination and sorting
+    const videos = await Video
+        .find(searchCondition)
+        .populate({ path: "owner", select: "username" })
+        .skip((page - 1) * limit)
+        .limit(parseInt(limit))
+        .sort({ [sortBy]: sortType })
+        .lean();
+
+    // Send the response with the videos
+    return res
+        .status(200)
+        .json(new ApiResponse(200, videos, "Videos fetched successfully"));
+
 
 })
 
@@ -44,6 +61,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
         thumbnail: thumbnailCloudinaryPath.url,
         title,
         description,
+        isPublished : true,
         owner : req.user._id,
         duration : videoDuration?videoDuration: 0
     })
@@ -74,15 +92,112 @@ const updateVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
     //TODO: update video details like title, description, thumbnail
 
+    const { title, description } = req.body
+
+    const thumbnailLocalPath = req.file?.path
+
+    if (!videoId?.trim()) {
+        throw new ApiError(400, "videoId is required")
+    }
+
+    if(!thumbnailLocalPath || !title || !description) {
+        throw new ApiError(400, "All fields are required")
+    }
+
+    const video = await Video.findById(videoId)
+
+    if(!video) {
+        throw new ApiError(404, "Video not found")
+    }
+
+    if(video.owner.toString() !== req.user._id.toString()) {
+        throw new ApiError(403, "You are not authorized to update this video")
+    }
+
+    const thumbnailCloudinaryPath = await uploadOnCloudinary(thumbnailLocalPath)
+
+    if(!thumbnailCloudinaryPath) {
+        throw new ApiError(500, "Something went wrong while uploading thumbnail")
+    }
+    
+    const updatedVideo = await Video.findByIdAndUpdate(
+        videoId,
+        {
+            $set: {
+                title,
+                description,
+                thumbnail: thumbnailCloudinaryPath.url
+            }
+        },
+        {
+            new: true
+        }
+    )   
+
+    if(!updatedVideo) {
+        throw new ApiError(404, "Video not found")
+    }   
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, updatedVideo, "Video updated successfully"))
+
 })
 
 const deleteVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
     //TODO: delete video
+
+    const video = await Video.findById(videoId)
+
+    if(!video) {
+        throw new ApiError(404, "Video not found")
+    }
+
+
+    if(video.owner.toString() !== req.user._id.toString()) {
+        throw new ApiError(403, "You are not authorized to delete this video")
+    }
+
+    await Video.findByIdAndDelete(videoId)
+
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, null, "Video deleted successfully"))
+
+    
 })
 
 const togglePublishStatus = asyncHandler(async (req, res) => {
-    const { videoId } = req.params
+    const { videoId } = req.params;
+
+    if (!videoId?.trim()) {
+        throw new ApiError(400, "videoId is required");
+    }
+
+    const {toggleStatus} = req.body;
+
+    const video = await Video.findById(videoId);
+
+    if (!video) {
+        throw new ApiError(404, "Video not found");
+    }
+
+    if(video.owner.toString() !== req.user._id.toString()) {
+        throw new ApiError(403, "You are not authorized to delete this video")
+    }
+
+    // Toggle the publication status
+    video.isPublished = toggleStatus? toggleStatus : !video.isPublished;
+
+    // Save the changes to the video document
+    const updatedVideo = await video.save();
+
+    // Send the response with the updated video details
+    return res
+        .status(200)
+        .json(new ApiResponse(200, updatedVideo, "Video publication status toggled successfully"));
 })
 
 export {

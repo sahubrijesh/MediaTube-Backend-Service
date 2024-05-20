@@ -13,14 +13,12 @@ const getVideoComments = asyncHandler(async (req, res) => {
         throw new ApiError(400, "videoId is required")
     }
 
-    
-
     const comments = await Comment
     .find({video: videoId})
     .populate({ path: "owner", select: "username" })
     .skip((page - 1) * limit)
     .limit(limit)
-    .sort({createdAt: -1})
+    .sort({createdAt: 1})
     .lean()
 
     return res
@@ -62,6 +60,16 @@ const updateComment = asyncHandler(async (req, res) => {
         throw new ApiError(400, "commentId is required")
     }
 
+    const comment = await Comment.findById(commentId)
+
+    if(!comment) {
+        throw new ApiError(404, "Comment not found")
+    }
+
+    if(comment.owner.toString() !== req.user._id.toString()) {
+        throw new ApiError(403, "You are not authorized to update this comment")
+    }
+
     const updatedComment = await Comment.findByIdAndUpdate(
         commentId,
         {
@@ -89,11 +97,18 @@ const deleteComment = asyncHandler(async (req, res) => {
         throw new ApiError(400, "commentId is required")
     }
 
-    const deletedComment = await Comment.deleteOne(
-        {
-            _id: commentId
-        }
-    )
+    const comment = await Comment.findById(commentId)
+
+    if(!comment) {
+        throw new ApiError(404, "Comment not found")
+    }
+
+    if(comment.owner.toString() !== req.user._id.toString()) {
+        throw new ApiError(403, "You are not authorized to delete this comment")
+    }
+    
+    const deletedComment = await Comment.findByIdAndDelete(commentId)
+
 
     return res
     .status(200)
