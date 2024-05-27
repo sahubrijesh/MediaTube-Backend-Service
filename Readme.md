@@ -4,54 +4,85 @@ The VideoTube-Backend-Service is a robust backend system designed to support a v
 
 ## Features
 
-- User Registration and Login system with secure password storage
-- JSON Web Token (JWT) based authentication for securing endpoints
-- User profile management including avatar and cover image upload with Cloudinary integration
-- User watch history tracking to provide personalized content
-- Channel profile information management for content creators
-- Access and Refresh Token handling for maintaining user sessions
+- Secure user registration and login system
+- JWT-based authentication to secure endpoints
+- Profile management with avatar and cover image uploads using Cloudinary
+- Tracking of user watch history for personalized content suggestions
+- Channel profile management for content creators
+- Session management with Access and Refresh Tokens
 
 ## Tech Stack
 
-- **Node.js**: JavaScript runtime for building fast, scalable network applications
-- **Express.js**: Web application framework for Node.js designed for building web applications and APIs
-- **MongoDB**: NoSQL database for modern applications with a powerful query language
-- **Mongoose**: Object Data Modeling (ODM) library for MongoDB and Node.js
-- **jsonwebtoken**: Implementation of JSON Web Tokens for Node.js
-- **bcrypt**: Library for hashing and salting user passwords
-- **Cloudinary**: Cloud service for managing web and mobile media assets
+- Node.js for the JavaScript runtime environment
+- Express.js as the web application framework
+- MongoDB as the NoSQL database
+- Mongoose ODM for MongoDB interaction
+- JSON Web Tokens for authentication
+- Bcrypt for password hashing
+- Cloudinary for media asset management
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js
-- MongoDB
-- Cloudinary account
+- Node.js installed on your machine
+- MongoDB installed and running
+- A Cloudinary account for media uploads
 
 ### Installation
 
-1. Clone the repository
-2. Install dependencies with `npm install`
-3. Set up your environment variables in a `.env` file
-4. Start the server with `npm start`
+1. Clone the repository to your local machine
+2. Navigate to the `backend` folder
+3. Install dependencies with `npm install`
+4. Set up your environment variables in a `.env` file
+
+    ```env
+    PORT=your_port
+    MONGODB_URI=your_mongodb_uri
+    CLOUDINARY_URL=your_cloudinary_url
+    JWT_SECRET=your_jwt_secret
+    ```
+
+5. Run the server using `npm start`
 
 ## API Endpoints
 
-The service exposes several RESTful endpoints for user management:
+### User Management
+- `POST /users/register`: Register a new user.
+- `POST /users/login`: User login.
+- `POST /users/refresh-token`: Refresh auth tokens.
+- `GET /users/current`: Get current user details.
+- `PATCH /users/update`: Update user profile.
 
-- POST `/api/v1/users/register`
-- POST `/api/v1/users/login`
-- POST `/api/v1/users/logout`
-- POST `/api/v1/users/refresh-token`
-- POST `/api/v1/users/change-password`
-- GET `/api/v1/users/current-user`
-- PATCH `/api/v1/users/update-account`
-- PATCH `/api/v1/users/avatar`
-- PATCH `/api/v1/users/cover-image`
-- GET `/api/v1/users/c/:username`
-- GET `/api/v1/users/history`
+### Video Management
+- `POST /videos`: Upload a video.
+- `GET /videos`: List all videos.
+- `GET /videos/{id}`: Retrieve a video.
+- `DELETE /videos/{id}`: Delete a video.
+
+### Channel Management
+- `GET /channels/{id}`: Get channel details.
+- `PATCH /channels/{id}`: Update channel info.
+
+### Interactions
+- `POST /videos/{id}/comments`: Comment on a video.
+- `POST /videos/{id}/likes`: Like a video.
+- `DELETE /videos/{id}/likes`: Unlike a video.
+
+### History
+- `GET /users/history`: Get watch history.
+- `POST /users/history`: Add to watch history.
 
 ## Contributing
 
-Contributions are welcome. Please open an issue to discuss your ideas or submit a pull request.
+We welcome contributions to the VideoTube-Backend-Service. If you have ideas for improvements or notice any issues, please open an issue first to discuss what you would like to change. For direct contributions, you can fork the repository and submit a pull request.
+
+## Acknowledgments
+
+- Thanks to all the contributors who invest their time into improving this project.
+
+## Contact Information
+
+For any inquiries or further discussions, you can contact the project maintainer at:
+
+- Email: thebrijeshsahu@gmail.com
