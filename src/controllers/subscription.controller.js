@@ -8,7 +8,6 @@ import {asyncHandler} from "../utils/asyncHandler.js"
 
 const toggleSubscription = asyncHandler(async (req, res) => {
     const {channelId} = req.params
-    // TODO: toggle subscription
 
     if (!channelId?.trim()) {
         throw new ApiError(400, "channel is missing")
