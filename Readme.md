@@ -66,8 +66,8 @@ The VideoTube-Backend-Service is a robust backend system designed to support a v
 
 ### Interactions
 - `POST /videos/{id}/comments`: Comment on a video.
-- `POST /videos/{id}/likes`: Like a video.
-- `DELETE /videos/{id}/likes`: Unlike a video.
+- `GET /videos/{id}/likes`: Like a video.
+- `GET /videos/{id}/likes`: Unlike a video.
 
 ### History
 - `GET /users/history`: Get watch history.
