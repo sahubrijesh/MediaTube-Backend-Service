@@ -1,4 +1,4 @@
-# VideoTube-Backend-Service
+# MediaTube-Backend-Service
 
 The VideoTube-Backend-Service is a robust backend system designed to support a video-sharing platform. It provides the essential server-side functionalities required to manage user interactions with video content. This includes user authentication, profile management, video watch history, and handling user-generated content such as avatars and cover images.
 
