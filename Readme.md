@@ -1,6 +1,6 @@
 # MediaTube-Backend-Service
 
-The VideoTube-Backend-Service is a robust backend system designed to support a video-sharing platform. It provides the essential server-side functionalities required to manage user interactions with video content. This includes user authentication, profile management, video watch history, and handling user-generated content such as avatars and cover images.
+The MediaTube-Backend-Service is a robust backend system designed to support a video-sharing platform. It provides the essential server-side functionalities required to manage user interactions with video content. This includes user authentication, profile management, video watch history, and handling user-generated content such as avatars and cover images.
 
 ## Features
 
@@ -75,7 +75,7 @@ The VideoTube-Backend-Service is a robust backend system designed to support a v
 
 ## Contributing
 
-We welcome contributions to the VideoTube-Backend-Service. If you have ideas for improvements or notice any issues, please open an issue first to discuss what you would like to change. For direct contributions, you can fork the repository and submit a pull request.
+We welcome contributions to the MediaTube-Backend-Service. If you have ideas for improvements or notice any issues, please open an issue first to discuss what you would like to change. For direct contributions, you can fork the repository and submit a pull request.
 
 ## Acknowledgments
 
